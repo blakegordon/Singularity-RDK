@@ -355,6 +355,15 @@ namespace Microsoft.Singularity.Hal
                     ioApics[0].SetRedirectionEntry((byte) z, ref re);
                 }
             }
+
+            // --- HYPER-V KEYBOARD HACK ---
+            // Bypass the broken ACPI parser entirely for the PS/2 keyboard.
+            // IRQ 1 is universally standard: Edge-Triggered, Active-High.
+            IoBits kbBits = (IoBits.DstPhysical | IoBits.DelModFixed | IoBits.IrqMask | IoBits.TriggerModeEdge);
+            RedirectionEntry kbRe = new RedirectionEntry(this.Id, kbBits, IrqToInterrupt(1));
+            ioApics[0].SetRedirectionEntry(1, ref kbRe);
+            // ----------------------------------------
+
             PrintIoApics();
         }
 
